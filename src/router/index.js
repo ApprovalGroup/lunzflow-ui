@@ -34,40 +34,40 @@ const Routers = new Router({
           component: resolve => require(['@/views/workbench/task/task'], resolve)
         },
         {
-          path: 'workbench/user/:ordercode',
-          name: '用户机构管理',
+          path: 'workbench/user/:organization',
+          name: 'organization',
           component: resolve => require(['@/views/workbench/user/organization'], resolve)
-        },
-        {
-          path: 'workbench/task/task1/:ordercode/:taskid/:processInstanceId',
-          name: '任务详情',
-          component: resolve => require(['@/views/workbench/task/instance/task1'], resolve)
-        },
-        {
-          path: 'workbench/task/task2/:ordercode/:taskid/:processInstanceId',
-          name: '任务详情',
-          component: resolve => require(['@/views/workbench/task/instance/task2'], resolve)
-        },
-        {
-          path: 'workbench/task/task3/:ordercode/:taskid/:processInstanceId',
-          name: '任务详情',
-          component: resolve => require(['@/views/workbench/task/instance/task3'], resolve)
-        },
-        {
-          path: 'workbench/task/task4/:ordercode/:taskid/:processInstanceId',
-          name: '任务详情',
-          component: resolve => require(['@/views/workbench/task/instance/task4'], resolve)
-        },
-        {
-          path: 'workbench/task/task5/:ordercode/:taskid/:processInstanceId',
-          name: '任务详情',
-          component: resolve => require(['@/views/workbench/task/instance/task5'], resolve)
-        },
-        {
-          path: 'workbench/task/task6/:ordercode/:taskid/:processInstanceId',
-          name: '任务详情',
-          component: resolve => require(['@/views/workbench/task/instance/task6'], resolve)
         }
+        // {
+        //   path: 'workbench/task/task1/:ordercode/:taskid/:processInstanceId',
+        //   name: '任务详情',
+        //   component: resolve => require(['@/views/workbench/task/instance/task1'], resolve)
+        // },
+        // {
+        //   path: 'workbench/task/task2/:ordercode/:taskid/:processInstanceId',
+        //   name: '任务详情',
+        //   component: resolve => require(['@/views/workbench/task/instance/task2'], resolve)
+        // },
+        // {
+        //   path: 'workbench/task/task3/:ordercode/:taskid/:processInstanceId',
+        //   name: '任务详情',
+        //   component: resolve => require(['@/views/workbench/task/instance/task3'], resolve)
+        // },
+        // {
+        //   path: 'workbench/task/task4/:ordercode/:taskid/:processInstanceId',
+        //   name: '任务详情',
+        //   component: resolve => require(['@/views/workbench/task/instance/task4'], resolve)
+        // },
+        // {
+        //   path: 'workbench/task/task5/:ordercode/:taskid/:processInstanceId',
+        //   name: '任务详情',
+        //   component: resolve => require(['@/views/workbench/task/instance/task5'], resolve)
+        // },
+        // {
+        //   path: 'workbench/task/task6/:ordercode/:taskid/:processInstanceId',
+        //   name: '任务详情',
+        //   component: resolve => require(['@/views/workbench/task/instance/task6'], resolve)
+        // }
       ]
     }, {
       path: '/Error',

@@ -66,47 +66,47 @@ export default {
     getMenu (type) {
       this.menu = [
         {
-          "children": [
-             {
-              "id": 5,
-              "name": "模型列表",
-              "parentId": 1,
-              "status": 0,
-              "type": "cd",
-              "url": "/home/workbench/model"
+          'children': [
+            {
+              'id': 5,
+              'name': '模型列表',
+              'parentId': 1,
+              'status': 0,
+              'type': 'cd',
+              'url': '/home/workbench/model'
             },
             {
-              "id": 2,
-              "name": "流程列表",
-              "parentId": 1,
-              "status": 0,
-              "type": "cd",
-              "url": "/home/workbench/process"
+              'id': 2,
+              'name': '流程列表',
+              'parentId': 1,
+              'status': 0,
+              'type': 'cd',
+              'url': '/home/workbench/process'
             },
             {
-              "id": 3,
-              "name": "任务列表",
-              "parentId": 1,
-              "status": 0,
-              "type": "cd",
-              "url": "/home/workbench/task/null"
+              'id': 3,
+              'name': '任务列表',
+              'parentId': 1,
+              'status': 0,
+              'type': 'cd',
+              'url': '/home/workbench/task/null'
             },
-             {
-              "id": 4,
-              "name": "用户机构管理",
-              "parentId": 1,
-              "status": 0,
-              "type": "cd",
-              "url": "/home/workbench/user/null"
+            {
+              'id': 4,
+              'name': '用户机构管理',
+              'parentId': 1,
+              'status': 0,
+              'type': 'cd',
+              'url': '/home/workbench/user/null'
             }
           ],
-          "id": 1,
-          "name": "工作台",
-          "status": 0,
-          "type": "ml",
-          "url": ""
+          'id': 1,
+          'name': '工作台',
+          'status': 0,
+          'type': 'ml',
+          'url': ''
         }
-      ];
+      ]
     }
   }
 }

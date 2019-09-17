@@ -21,46 +21,46 @@
 </template>
 
 <script>
-    export default {
-      name: "login",
-      data(){
-        return {
-          loginForm:{
-            passport:'',
-            passwd:''
-          },
-          rules:{
-            passport: [
-              { required: true, message: '请输入用户名！', trigger: 'blur' },
-              { min: 3, max: 18, message: '长度在 6 到 18 个字符', trigger: 'blur' }
-            ],
-            passwd: [
-              { required: true, message: '请输入密码！', trigger: 'blur' },
-              { min: 3, max: 18, message: '长度在 6 到 18 个字符', trigger: 'blur' }
-            ]
-          },
-          passwordType:'password'
-        }
+export default {
+  name: 'login',
+  data () {
+    return {
+      loginForm: {
+        passport: '',
+        passwd: ''
       },
-      methods:{
-        showPwd(){
-          console.log(this)
-          if (this.passwordType === '') {
-            this.passwordType = 'password'
-          } else {
-            this.passwordType = ''
-          }
-        },
-        login(name){
-          this.$refs[name].validate((valid) => {
-            if (valid) {
-              this.$store.commit("updataUser",this.loginForm);
-              this.$router.push("/home/");
-            }
-          })
-        }
-      }
+      rules: {
+        passport: [
+          { required: true, message: '请输入用户名！', trigger: 'blur' },
+          { min: 3, max: 18, message: '长度在 6 到 18 个字符', trigger: 'blur' }
+        ],
+        passwd: [
+          { required: true, message: '请输入密码！', trigger: 'blur' },
+          { min: 3, max: 18, message: '长度在 6 到 18 个字符', trigger: 'blur' }
+        ]
+      },
+      passwordType: 'password'
     }
+  },
+  methods: {
+    showPwd () {
+      console.log(this)
+      if (this.passwordType === '') {
+        this.passwordType = 'password'
+      } else {
+        this.passwordType = ''
+      }
+    },
+    login (name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          this.$store.commit('updataUser', this.loginForm)
+          this.$router.push('/home/')
+        }
+      })
+    }
+  }
+}
 </script>
 
 <style scoped>

@@ -51,7 +51,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="findData">查询</el-button>
-          <el-button @click="$refs['form'].resetFields();">重置</el-button>
+          <el-button @click="$refs['form'].resetFields()">重置</el-button>
         </el-form-item>
       </el-form>
     </el-row>
@@ -100,149 +100,149 @@
 </template>
 
 <script>
-    import startProcess from './startProcess';
-    import imgDialog from '@/views/publicComponents/imgShowCom/imgDialog';
-    export default {
-      name: "process",
-      components: {
-        startProcess,
-        imgDialog
+import startProcess from './startProcess'
+import imgDialog from '@/views/publicComponents/imgShowCom/imgDialog'
+export default {
+  name: 'process',
+  components: {
+    startProcess,
+    imgDialog
+  },
+  data () {
+    return {
+      templateVisible: false,
+      imgDialogVisible: false,
+      processDefinitionId: null,
+      processInstanceId: null,
+      form: {
+        orderCode: null,
+        processName: null,
+        productName: null,
+        finished: false,
+        startTimeRange: [],
+        endTimeRange: []
       },
-      data() {
-        return {
-          templateVisible: false,
-          imgDialogVisible: false,
-          processDefinitionId: null,
-          processInstanceId: null,
-          form: {
-            orderCode: null,
-            processName: null,
-            productName: null,
-            finished:false,
-            startTimeRange:[],
-            endTimeRange:[]
-          },
-          tableData:{
-            pageNo:1,
-            pageSize:10,
-            totalCount:0,
-            list:[]
-          },
-          pickerOptions2: {
-            shortcuts: [{
-              text: '最近一周',
-              onClick(picker) {
-                const end = new Date();
-                const start = new Date();
-                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-                picker.$emit('pick', [start, end]);
-              }
-            }, {
-              text: '最近一个月',
-              onClick(picker) {
-                const end = new Date();
-                const start = new Date();
-                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-                picker.$emit('pick', [start, end]);
-              }
-            }, {
-              text: '最近三个月',
-              onClick(picker) {
-                const end = new Date();
-                const start = new Date();
-                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-                picker.$emit('pick', [start, end]);
-              }
-            }]
+      tableData: {
+        pageNo: 1,
+        pageSize: 10,
+        totalCount: 0,
+        list: []
+      },
+      pickerOptions2: {
+        shortcuts: [{
+          text: '最近一周',
+          onClick (picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+            picker.$emit('pick', [start, end])
           }
-        }
-      },
-      created:function(){
-        this.findData();
-      },
-      computed:{
-        start:function(){
-          return (this.tableData.pageNo - 1) * this.tableData.pageSize;
-        }
-      },
-      methods: {
-        handleSizeChange:function(val){
-          this.tableData.pageSize = val;
-          this.findData();
-        },
-        handleCurrentChange:function(val){
-          this.tableData.pageNo = val;
-          this.findData();
-        },
-        handlePrevChange:function(val){
-          this.tableData.pageNo = val;
-        },
-        handleNextChange:function(val){
-          this.tableData.pageNo = val;
-        },
-        findData() {
-          var _this = this
-          this.$axios.post(this.$api.flowableapi+"query/historic-process-instances",
-            {
-              businessKey: this.form.businessKey,
-              processDefinitionName: this.form.processName,
-              processDefinitionCategory: this.form.productName,
-              finished: this.form.finished,
-              startedBefore: this.form.startTimeRange[1],
-              startedAfter: this.form.startTimeRange[0],
-              finishedBefore: this.form.endTimeRange[1],
-              finishedAfter: this.form.endTimeRange[0]
-            },{
-            params: {
-              sort: "startTime",
-              order: "desc",
-              start: this.start,
-              size: this.tableData.pageSize
-            }
-          })
-            .then(function (response) {
-              var result = response.data.data;
-              for (let i = 0; i < result.length; i++){
-                _this.$axios.get(result[i].processDefinitionUrl,{})
-                  .then(function (response2) {
-                    _this.$set(result[i],"categoryTe",response2.data.category)
-                  })
-              }
-              _this.tableData.list = result;
-              _this.tableData.totalCount = response.data.total;
-            })
-            .catch(function (error) {
-              _this.$message.error(error.toString())
-            });
-        },
-        getDiagramByInstanceId(processInstanceId) {
-          this.processInstanceId = processInstanceId;
-          this.imgDialogVisible = true;
-        },
-        getDiagramByDefinitionId(processDefinitionId) {
-          this.processDefinitionId = processDefinitionId;
-          this.imgDialogVisible = true;
-        },
-        cancelProcessInstance(processInstanceId) {
-          const _this = this;
-          this.$axios.delete(this.$api.flowableapi+'runtime/process-instances/'+processInstanceId,{})
-            .then(function (response) {
-              if (response.status != 204) {
-                _this.$message.error(response.statusText)
-              } else {
-                _this.$message.success("deleted")
-                _this.findData()
-              }
-            })
-            .catch(function (error) {
-              _this.$message.error(error.toString())
-            });
-        },
-        turnToTask(ordercode) {
-          this.$router.push(`/home/workbench/task/${ordercode}`)
-        }
+        }, {
+          text: '最近一个月',
+          onClick (picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '最近三个月',
+          onClick (picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+            picker.$emit('pick', [start, end])
+          }
+        }]
       }
     }
+  },
+  created: function () {
+    this.findData()
+  },
+  computed: {
+    start: function () {
+      return (this.tableData.pageNo - 1) * this.tableData.pageSize
+    }
+  },
+  methods: {
+    handleSizeChange: function (val) {
+      this.tableData.pageSize = val
+      this.findData()
+    },
+    handleCurrentChange: function (val) {
+      this.tableData.pageNo = val
+      this.findData()
+    },
+    handlePrevChange: function (val) {
+      this.tableData.pageNo = val
+    },
+    handleNextChange: function (val) {
+      this.tableData.pageNo = val
+    },
+    findData () {
+      var _this = this
+      this.$axios.post(this.$api.flowableapi + 'query/historic-process-instances',
+        {
+          businessKey: this.form.businessKey,
+          processDefinitionName: this.form.processName,
+          processDefinitionCategory: this.form.productName,
+          finished: this.form.finished,
+          startedBefore: this.form.startTimeRange[1],
+          startedAfter: this.form.startTimeRange[0],
+          finishedBefore: this.form.endTimeRange[1],
+          finishedAfter: this.form.endTimeRange[0]
+        }, {
+          params: {
+            sort: 'startTime',
+            order: 'desc',
+            start: this.start,
+            size: this.tableData.pageSize
+          }
+        })
+        .then(function (response) {
+          var result = response.data.data
+          for (let i = 0; i < result.length; i++) {
+            _this.$axios.get(result[i].processDefinitionUrl, {})
+              .then(function (response2) {
+                _this.$set(result[i], 'categoryTe', response2.data.category)
+              })
+          }
+          _this.tableData.list = result
+          _this.tableData.totalCount = response.data.total
+        })
+        .catch(function (error) {
+          _this.$message.error(error.toString())
+        })
+    },
+    getDiagramByInstanceId (processInstanceId) {
+      this.processInstanceId = processInstanceId
+      this.imgDialogVisible = true
+    },
+    getDiagramByDefinitionId (processDefinitionId) {
+      this.processDefinitionId = processDefinitionId
+      this.imgDialogVisible = true
+    },
+    cancelProcessInstance (processInstanceId) {
+      const _this = this
+      this.$axios.delete(this.$api.flowableapi + 'runtime/process-instances/' + processInstanceId, {})
+        .then(function (response) {
+          if (response.status !== 204) {
+            _this.$message.error(response.statusText)
+          } else {
+            _this.$message.success('deleted')
+            _this.findData()
+          }
+        })
+        .catch(function (error) {
+          _this.$message.error(error.toString())
+        })
+    },
+    turnToTask (ordercode) {
+      this.$router.push(`/home/workbench/task/${ordercode}`)
+    }
+  }
+}
 </script>
 
 <style scoped>

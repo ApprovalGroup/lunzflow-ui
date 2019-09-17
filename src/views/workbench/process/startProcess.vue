@@ -14,7 +14,8 @@
       <el-form-item label="业务分类：">
         <el-select v-model="formData.processDefinitionId" placeholder="请选择流程">
             <el-option
-              v-for="item in processDefinitionList"
+              v-for="(item,index) in processDefinitionList"
+              v-bind:key="index"
               :label="item.name"
               :value="item.id">
               <span style="float: left">{{ item.name }}</span>
@@ -31,75 +32,75 @@
 </template>
 
 <script>
-    export default {
-      name: "startProcess",
-      data:function(){
-        return {
-          templateDialog: this.templateVisible,
-          formData:{
-            orderCode:null,
-            processDefinitionId:null
-          },
-          processDefinitionList:[
-            {
-              name:"专利-发明专用流程",
-              id:"1",
-              version:21
-            }
-          ]
-        }
+export default {
+  name: 'startProcess',
+  data: function () {
+    return {
+      templateDialog: this.templateVisible,
+      formData: {
+        orderCode: null,
+        processDefinitionId: null
       },
-      props: {
-        templateVisible: {
-          type: Boolean,
-          default: false
+      processDefinitionList: [
+        {
+          name: '专利-发明专用流程',
+          id: '1',
+          version: 21
         }
-      },
-      watch: {
-        templateVisible: function(){
-          this.templateDialog = this.templateVisible
-        }
-      },
-      methods: {
-        closeDia() {
-          this.$emit('update:templateVisible', false);
-        },
-        openDia() {
-          const _this = this;
-          this.$axios.get(this.$api.flowableapi+"repository/process-definitions",{
-            params: {
-              size: 500
-            }
-          })
-            .then(function (response) {
-              _this.processDefinitionList = response.data.data;
-            })
-            .catch(function (error) {
-              _this.$message.error(error.toString())
-            });
-        },
-        startProcess() {
-          const _this = this;
-          this.$axios.post(this.$api.flowableapi+"runtime/process-instances",{
-            processDefinitionId: this.formData.processDefinitionId,
-            businessKey: this.formData.orderCode
-          },{})
-            .then(function (response) {
-              if (response.status != 201) {
-                _this.$message.error(response.statusText)
-              } else {
-                _this.$message.success(response.statusText)
-                _this.formData.orderCode = null;
-                _this.formData.processDefinitionId = null;
-                _this.templateDialog = false;
-              }
-            })
-            .catch(function (error) {
-              _this.$message.error(error.toString())
-            });
-        }
-      }
+      ]
     }
+  },
+  props: {
+    templateVisible: {
+      type: Boolean,
+      default: false
+    }
+  },
+  watch: {
+    templateVisible: function () {
+      this.templateDialog = this.templateVisible
+    }
+  },
+  methods: {
+    closeDia () {
+      this.$emit('update:templateVisible', false)
+    },
+    openDia () {
+      const _this = this
+      this.$axios.get(this.$api.flowableapi + 'repository/process-definitions', {
+        params: {
+          size: 500
+        }
+      })
+        .then(function (response) {
+          _this.processDefinitionList = response.data.data
+        })
+        .catch(function (error) {
+          _this.$message.error(error.toString())
+        })
+    },
+    startProcess () {
+      const _this = this
+      this.$axios.post(this.$api.flowableapi + 'runtime/process-instances', {
+        processDefinitionId: this.formData.processDefinitionId,
+        businessKey: this.formData.orderCode
+      }, {})
+        .then(function (response) {
+          if (response.status !== 201) {
+            _this.$message.error(response.statusText)
+          } else {
+            _this.$message.success(response.statusText)
+            _this.formData.orderCode = null
+            _this.formData.processDefinitionId = null
+            _this.templateDialog = false
+          }
+        })
+        .catch(function (error) {
+          _this.$message.error(error.toString())
+        })
+    }
+  }
+}
 </script>
 
 <style scoped>

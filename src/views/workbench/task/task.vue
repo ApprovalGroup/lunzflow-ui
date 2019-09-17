@@ -65,7 +65,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="findData">查询</el-button>
-          <el-button @click="$refs['form'].resetFields();">重置</el-button>
+          <el-button @click="$refs['form'].resetFields()">重置</el-button>
         </el-form-item>
       </el-form>
     </el-row>
@@ -140,291 +140,287 @@
 </template>
 
 <script>
-  import imgDialog from '@/views/publicComponents/imgShowCom/imgDialog';
-  import demoTree from '@/views/publicComponents/treeSelectCom/demoTree';
-    export default {
-      name: "task",
-      components: {
-        imgDialog,
-        demoTree
+import imgDialog from '@/views/publicComponents/imgShowCom/imgDialog'
+import demoTree from '@/views/publicComponents/treeSelectCom/demoTree'
+export default {
+  name: 'task',
+  components: {
+    imgDialog,
+    demoTree
+  },
+  data () {
+    return {
+      imgDialogVisible: false,
+      demoTreeDialogVisible: false,
+      processDefinitionId: null,
+      processInstanceId: null,
+      decidedType: null,
+      dealingTaskId: null,
+      form: {
+        orderCode: null,
+        processName: null,
+        taskName: null,
+        processFinished: false,
+        createTimeRange: [],
+        dueTimeRange: [],
+        finishedTimeRange: [],
+        taskType: 'myTask'
       },
-      data(){
-        return {
-          imgDialogVisible: false,
-          demoTreeDialogVisible: false,
-          processDefinitionId: null,
-          processInstanceId: null,
-          decidedType:null,
-          dealingTaskId:null,
-          form:{
-            orderCode: null,
-            processName: null,
-            taskName:null,
-            processFinished:false,
-            createTimeRange:[],
-            dueTimeRange:[],
-            finishedTimeRange:[],
-            taskType:"myTask"
-          },
-          tableData:{
-            pageNo:1,
-            pageSize:10,
-            totalCount:0,
-            list:[]
-          },
-          dealingData:null,
-          pickerOptions2: {
-            shortcuts: [{
-              text: '最近一周',
-              onClick(picker) {
-                const end = new Date();
-                const start = new Date();
-                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-                picker.$emit('pick', [start, end]);
-              }
-            }, {
-              text: '最近一个月',
-              onClick(picker) {
-                const end = new Date();
-                const start = new Date();
-                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-                picker.$emit('pick', [start, end]);
-              }
-            }, {
-              text: '最近三个月',
-              onClick(picker) {
-                const end = new Date();
-                const start = new Date();
-                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-                picker.$emit('pick', [start, end]);
-              }
-            }]
-          }
-        }
+      tableData: {
+        pageNo: 1,
+        pageSize: 10,
+        totalCount: 0,
+        list: []
       },
-      methods: {
-        handleSizeChange:function(val){
-          this.tableData.pageSize = val;
-          this.findData();
-        },
-        handlePrevChange:function(val){
-          this.tableData.pageNo = val;
-        },
-        handleNextChange:function(val){
-          this.tableData.pageNo = val;
-        },
-        handleCurrentChange:function(val){
-          this.tableData.pageNo = val;
-          this.findData();
-        },
-        findData() {
-          switch(this.form.taskType)
-          {
-            case "myTask":
-              this.findDealingTask();
-              break;
-            case "claimingTask":
-              this.findDealingTask();
-              break;
-            case "historyTask":
-              this.findHistoryTask();
-              break;
+      dealingData: null,
+      pickerOptions2: {
+        shortcuts: [{
+          text: '最近一周',
+          onClick (picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+            picker.$emit('pick', [start, end])
           }
-        },
-        findDealingTask() {
-          const _this = this;
-          var bodyData = {
-            processInstanceBusinessKeyLike: this.form.orderCode,
-            nameLike: this.form.taskName,
-            processDefinitionNameLike: this.form.processName,
-            createdAfter: this.form.createTimeRange[0],
-            createdBefore: this.form.createTimeRange[1],
-            dateAfter: this.form.dueTimeRange[0],
-            dueBefore: this.form.dueTimeRange[1]
+        }, {
+          text: '最近一个月',
+          onClick (picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+            picker.$emit('pick', [start, end])
           }
-          switch(this.form.taskType)
-          {
-            case "myTask":
-              bodyData.assigneeLike = this.$store.state.app.user.passport;
-              break;
-            case "claimingTask":
-              bodyData.unassigned = true;
-              bodyData.candidateUser = this.$store.state.app.user.passport;
-              break;
+        }, {
+          text: '最近三个月',
+          onClick (picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+            picker.$emit('pick', [start, end])
           }
-          this.$axios.post(this.$api.flowableapi+"query/tasks",
-            bodyData
-            ,{
-              params:{
-                sort: "createTime",
-                order: "desc",
-                start: this.start,
-                size: this.tableData.pageSize
-              }
-            })
-            .then(function (response) {
-              if (response.status != 200) {
-                _this.$message.error(response.statusText)
-              }
-              var result = response.data.data;
-              for (let i = 0; i < result.length; i++){
-                _this.$axios.get(result[i].processDefinitionUrl,{})
-                  .then(function (response2) {
-                    _this.$set(result[i],"processName",response2.data.name)
-                    _this.$set(result[i],"productName",response2.data.category)
-                  })
-                _this.$axios.get(result[i].processInstanceUrl,{})
-                  .then(function (response2) {
-                    _this.$set(result[i],"orderCode",response2.data.businessKey)
-                  })
-              }
-              _this.tableData.list = result;
-              _this.tableData.totalCount = response.data.total;
-
-            })
-            .catch(function (error) {
-              _this.$message.error(error.toString())
-            });
-        },
-        findHistoryTask() {
-          const _this = this;
-          var bodyData = {
-            processBusinessKeyLike: this.form.orderCode,
-            taskNameLike: this.form.taskName,
-            processDefinitionNameLike: this.form.processName,
-            taskCreatedAfter: this.form.createTimeRange[0],
-            taskCreatedBefore: this.form.createTimeRange[1],
-            dueDateAfter: this.form.dueTimeRange[0],
-            dueDateBefore: this.form.dueTimeRange[1],
-            taskCompletedAfter: this.form.finishedTimeRange[0],
-            taskCompletedBefore: this.form.finishedTimeRange[1],
-            finished : true,
-            processFinished : this.form.processFinished,
-            taskAssignee : this.$store.state.app.user.passport
-          }
-          this.$axios.post(this.$api.flowableapi+"query/historic-task-instances",
-            bodyData
-            ,{
-              params:{
-                sort: "startTime",
-                order: "desc",
-                start: this.start,
-                size: this.tableData.pageSize
-              }
-            })
-            .then(function (response) {
-              if (response.status != 200) {
-                _this.$message.error(response.statusText)
-              }
-              var result = response.data.data;
-              for (let i = 0; i < result.length; i++){
-                _this.$axios.get(result[i].processDefinitionUrl,{})
-                  .then(function (response2) {
-                    _this.$set(result[i],"processName",response2.data.name)
-                    _this.$set(result[i],"productName",response2.data.category)
-                  })
-                _this.$axios.get(result[i].processInstanceUrl,{})
-                  .then(function (response2) {
-                    _this.$set(result[i],"orderCode",response2.data.businessKey)
-                  })
-              }
-              _this.tableData.list = result;
-              _this.tableData.totalCount = response.data.total;
-
-            })
-            .catch(function (error) {
-              _this.$message.error(error.toString())
-            });
-        },
-        dealTask(actionType) {
-          const _this = this;
-          this.$axios.post(this.$api.flowableapi+"runtime/tasks/"+_this.dealingData.id,{
-            action : actionType,
-            assignee : _this.$store.state.app.user.passport
-          },{})
-            .then(function (response) {
-              if (response.status != 200) {
-                _this.$message.error(response.statusText)
-              }
-              _this.$message.success(response.statusText)
-            })
-            .catch(function (error) {
-              _this.$message.error(error.toString())
-            });
-        },
-        delegateTask() {
-          if (!!!this.dealingData) {
-            this.$message.warning("Please choose the data you want to deal.")
-            return;
-          }
-          this.dealingTaskId = this.dealingData.id;
-          this.demoTreeDialogVisible=true;
-        },
-        taskTypeChanged() {
-          this.tableData.pageNo = 0;
-          this.tableData.pageSize = 10;
-          this.findData();
-        },
-        handleCurrentRowChange(val) {
-          this.dealingData = val;
-        },
-        dealServiceDataWithoutParam() {
-          if (!!!this.dealingData) {
-            this.$message.warning("Please choose the data you want to deal.")
-            return;
-          }
-          this.$router.push(`${this.dealingData.category}${this.dealingData.orderCode}/${this.dealingData.id}/${this.dealingData.processInstanceId}`);
-        },
-        dealServiceData(taskCategory, ordercode, taskId, processInstanceId) {
-          console.log(`${taskCategory}${ordercode}/${taskId}/${processInstanceId}`)
-          this.$router.push(`${taskCategory}${ordercode}/${taskId}/${processInstanceId}`);
-        },
-        getDiagramWithoutParamByInstanceId() {
-          if (!!!this.dealingData) {
-            this.$message.warning("Please choose the data you want to deal.")
-            return;
-          }
-          this.decidedType = "instance";
-          this.processDefinitionId = null;
-          this.processInstanceId = this.dealingData.processInstanceId;
-          this.imgDialogVisible = true;
-        },
-        getDiagramWithoutParamByDefinitionId() {
-          if (!!!this.dealingData) {
-            this.$message.warning("Please choose the data you want to deal.")
-            return;
-          }
-          this.decidedType = "definition";
-          this.processInstanceId = null;
-          this.processDefinitionId = this.dealingData.processDefinitionId;
-          this.imgDialogVisible = true;
-        },
-        getDiagramByInstanceId(processInstanceId) {
-          this.decidedType = "instance";
-          this.processDefinitionId = null;
-          this.processInstanceId = processInstanceId;
-          this.imgDialogVisible = true;
-        },
-        getDiagramByDefinitionId(processDefinitionId) {
-          console.log(processDefinitionId)
-          this.decidedType = "definition";
-          this.processInstanceId = null;
-          this.processDefinitionId = processDefinitionId;
-          this.imgDialogVisible = true;
-        }
-      },
-      computed:{
-        start:function(){
-          return (this.tableData.pageNo - 1) * this.tableData.pageSize;
-        }
-      },
-      created(){
-        if (this.$route.params.ordercode != "" && this.$route.params.ordercode != "null" && this.$route.params.ordercode != null) {
-          this.form.orderCode = this.$route.params.ordercode;
-        }
-        this.findData();
+        }]
       }
     }
+  },
+  methods: {
+    handleSizeChange: function (val) {
+      this.tableData.pageSize = val
+      this.findData()
+    },
+    handlePrevChange: function (val) {
+      this.tableData.pageNo = val
+    },
+    handleNextChange: function (val) {
+      this.tableData.pageNo = val
+    },
+    handleCurrentChange: function (val) {
+      this.tableData.pageNo = val
+      this.findData()
+    },
+    findData () {
+      switch (this.form.taskType) {
+        case 'myTask':
+          this.findDealingTask()
+          break
+        case 'claimingTask':
+          this.findDealingTask()
+          break
+        case 'historyTask':
+          this.findHistoryTask()
+          break
+      }
+    },
+    findDealingTask () {
+      const _this = this
+      var bodyData = {
+        processInstanceBusinessKeyLike: this.form.orderCode,
+        nameLike: this.form.taskName,
+        processDefinitionNameLike: this.form.processName,
+        createdAfter: this.form.createTimeRange[0],
+        createdBefore: this.form.createTimeRange[1],
+        dateAfter: this.form.dueTimeRange[0],
+        dueBefore: this.form.dueTimeRange[1]
+      }
+      switch (this.form.taskType) {
+        case 'myTask':
+          bodyData.assigneeLike = this.$store.state.app.user.passport
+          break
+        case 'claimingTask':
+          bodyData.unassigned = true
+          bodyData.candidateUser = this.$store.state.app.user.passport
+          break
+      }
+      this.$axios.post(this.$api.flowableapi + 'query/tasks',
+        bodyData
+        , {
+          params: {
+            sort: 'createTime',
+            order: 'desc',
+            start: this.start,
+            size: this.tableData.pageSize
+          }
+        })
+        .then(function (response) {
+          if (response.status !== 200) {
+            _this.$message.error(response.statusText)
+          }
+          var result = response.data.data
+          for (let i = 0; i < result.length; i++) {
+            _this.$axios.get(result[i].processDefinitionUrl, {})
+              .then(function (response2) {
+                _this.$set(result[i], 'processName', response2.data.name)
+                _this.$set(result[i], 'productName', response2.data.category)
+              })
+            _this.$axios.get(result[i].processInstanceUrl, {})
+              .then(function (response2) {
+                _this.$set(result[i], 'orderCode', response2.data.businessKey)
+              })
+          }
+          _this.tableData.list = result
+          _this.tableData.totalCount = response.data.total
+        })
+        .catch(function (error) {
+          _this.$message.error(error.toString())
+        })
+    },
+    findHistoryTask () {
+      const _this = this
+      var bodyData = {
+        processBusinessKeyLike: this.form.orderCode,
+        taskNameLike: this.form.taskName,
+        processDefinitionNameLike: this.form.processName,
+        taskCreatedAfter: this.form.createTimeRange[0],
+        taskCreatedBefore: this.form.createTimeRange[1],
+        dueDateAfter: this.form.dueTimeRange[0],
+        dueDateBefore: this.form.dueTimeRange[1],
+        taskCompletedAfter: this.form.finishedTimeRange[0],
+        taskCompletedBefore: this.form.finishedTimeRange[1],
+        finished: true,
+        processFinished: this.form.processFinished,
+        taskAssignee: this.$store.state.app.user.passport
+      }
+      this.$axios.post(this.$api.flowableapi + 'query/historic-task-instances',
+        bodyData
+        , {
+          params: {
+            sort: 'startTime',
+            order: 'desc',
+            start: this.start,
+            size: this.tableData.pageSize
+          }
+        })
+        .then(function (response) {
+          if (response.status !== 200) {
+            _this.$message.error(response.statusText)
+          }
+          var result = response.data.data
+          for (let i = 0; i < result.length; i++) {
+            _this.$axios.get(result[i].processDefinitionUrl, {})
+              .then(function (response2) {
+                _this.$set(result[i], 'processName', response2.data.name)
+                _this.$set(result[i], 'productName', response2.data.category)
+              })
+            _this.$axios.get(result[i].processInstanceUrl, {})
+              .then(function (response2) {
+                _this.$set(result[i], 'orderCode', response2.data.businessKey)
+              })
+          }
+          _this.tableData.list = result
+          _this.tableData.totalCount = response.data.total
+        })
+        .catch(function (error) {
+          _this.$message.error(error.toString())
+        })
+    },
+    dealTask (actionType) {
+      const _this = this
+      this.$axios.post(this.$api.flowableapi + 'runtime/tasks/' + _this.dealingData.id, {
+        action: actionType,
+        assignee: _this.$store.state.app.user.passport
+      }, {})
+        .then(function (response) {
+          if (response.status !== 200) {
+            _this.$message.error(response.statusText)
+          }
+          _this.$message.success(response.statusText)
+        })
+        .catch(function (error) {
+          _this.$message.error(error.toString())
+        })
+    },
+    delegateTask () {
+      if (!this.dealingData) {
+        this.$message.warning('Please choose the data you want to deal.')
+        return
+      }
+      this.dealingTaskId = this.dealingData.id
+      this.demoTreeDialogVisible = true
+    },
+    taskTypeChanged () {
+      this.tableData.pageNo = 0
+      this.tableData.pageSize = 10
+      this.findData()
+    },
+    handleCurrentRowChange (val) {
+      this.dealingData = val
+    },
+    dealServiceDataWithoutParam () {
+      if (!this.dealingData) {
+        this.$message.warning('Please choose the data you want to deal.')
+        return
+      }
+      this.$router.push(`${this.dealingData.category}${this.dealingData.orderCode}/${this.dealingData.id}/${this.dealingData.processInstanceId}`)
+    },
+    dealServiceData (taskCategory, ordercode, taskId, processInstanceId) {
+      console.log(`${taskCategory}${ordercode}/${taskId}/${processInstanceId}`)
+      this.$router.push(`${taskCategory}${ordercode}/${taskId}/${processInstanceId}`)
+    },
+    getDiagramWithoutParamByInstanceId () {
+      if (!this.dealingData) {
+        this.$message.warning('Please choose the data you want to deal.')
+        return
+      }
+      this.decidedType = 'instance'
+      this.processDefinitionId = null
+      this.processInstanceId = this.dealingData.processInstanceId
+      this.imgDialogVisible = true
+    },
+    getDiagramWithoutParamByDefinitionId () {
+      if (!this.dealingData) {
+        this.$message.warning('Please choose the data you want to deal.')
+        return
+      }
+      this.decidedType = 'definition'
+      this.processInstanceId = null
+      this.processDefinitionId = this.dealingData.processDefinitionId
+      this.imgDialogVisible = true
+    },
+    getDiagramByInstanceId (processInstanceId) {
+      this.decidedType = 'instance'
+      this.processDefinitionId = null
+      this.processInstanceId = processInstanceId
+      this.imgDialogVisible = true
+    },
+    getDiagramByDefinitionId (processDefinitionId) {
+      console.log(processDefinitionId)
+      this.decidedType = 'definition'
+      this.processInstanceId = null
+      this.processDefinitionId = processDefinitionId
+      this.imgDialogVisible = true
+    }
+  },
+  computed: {
+    start: function () {
+      return (this.tableData.pageNo - 1) * this.tableData.pageSize
+    }
+  },
+  created () {
+    if (this.$route.params.ordercode !== '' && this.$route.params.ordercode !== 'null' && this.$route.params.ordercode != null) {
+      this.form.orderCode = this.$route.params.ordercode
+    }
+    this.findData()
+  }
+}
 </script>
 
 <style scoped>
